@@ -1,0 +1,36 @@
+web:
+  image: scomm/php5.6
+  ports:
+    - "80:80"
+  links:
+    - dbpostgres
+    - dbmysql
+  volumes:
+    - .:/var/www/html
+  environment:
+    PHPAR_MYSQL: mysql://root:password@dbpostgres/phpar_test
+    PHPAR_PGSQL: pgsql://postgres:password@dbmysql/phpar_test
+  # command:
+  #   - echo 'extension = "memcache.so"' >> /usr/local/etc/php.ini-production
+  #   - echo 'extension = "memcache.so"' >> /usr/local/etc/php.ini-production
+
+dbpostgres:
+  image: postgres:9.5-alpine
+  ports:
+    - "5432:5432"
+  environment:
+    POSTGRES_DB: phpar_test
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: password
+
+dbmysql:
+  image: mysql:5.7.30
+  ports:
+    - "3306:3306"
+  environment:
+    MYSQL_DATABASE: phpar_test
+    #    MYSQL_USER: root
+    #    MYSQL_PASSWORD: password
+    MYSQL_ROOT_PASSWORD: password
+
+#MYSQL_ROOT_PASSWORD, MYSQL_ALLOW_EMPTY_PASSWORD and MYSQL_RANDOM_ROOT_PASSWORD

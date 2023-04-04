@@ -102,8 +102,11 @@ Depois de definir essas três configurações, você estará pronto. ActiveRecor
 Ele não requer que você mapeie seu esquema de tabela para arquivos yaml/xml. Ele consultará o banco de dados para obter essas informações e
 armazene-o em cache para que não faça várias chamadas ao banco de dados para um único esquema.
 
-## Basic CRUD ##
-
+## Test ##
+```
+composer update
+vendor/bin/phpunit test/
+```
 ### Retrieve ###
 Estes são seus métodos básicos para encontrar e recuperar registros de seu banco de dados.
 Veja a seção *Finders* para mais detalhes.
