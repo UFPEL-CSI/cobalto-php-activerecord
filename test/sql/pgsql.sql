@@ -58,10 +58,10 @@ CREATE TABLE positions (
 	active SMALLINT NOT NULL
 );
 
-CREATE TABLE "rm-bldg"(
-    "rm-id" SERIAL PRIMARY KEY,
-    "rm-name" VARCHAR(10) NOT NULL,
-    "space out" VARCHAR(1) NOT NULL
+CREATE TABLE rm_bldg(
+    rm_id SERIAL PRIMARY KEY,
+    rm_name VARCHAR(10) NOT NULL,
+    space_out VARCHAR(1) NOT NULL
 );
 
 CREATE TABLE awesome_people(

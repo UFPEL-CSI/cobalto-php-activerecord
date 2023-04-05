@@ -1,5 +1,5 @@
 web:
-  image: scomm/php5.6
+  image: php:5.6.40-fpm-alpine
   ports:
     - "80:80"
   links:
@@ -7,12 +7,11 @@ web:
     - dbmysql
   volumes:
     - .:/var/www/html
+    - ./docker/:/usr/local/etc/php
   environment:
-    PHPAR_MYSQL: mysql://root:password@dbpostgres/phpar_test
-    PHPAR_PGSQL: pgsql://postgres:password@dbmysql/phpar_test
-  # command:
-  #   - echo 'extension = "memcache.so"' >> /usr/local/etc/php.ini-production
-  #   - echo 'extension = "memcache.so"' >> /usr/local/etc/php.ini-production
+    PHPAR_MYSQL: mysql://root:password@dbmysql/phpar_test
+    PHPAR_PGSQL: pgsql://postgres:password@dbpostgres/phpar_test
+  entrypoint: sh /var/www/html/docker/init.sh 
 
 dbpostgres:
   image: postgres:9.5-alpine

@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../lib/adapters/SqliteAdapter.php';
 
 class SqliteAdapterTest extends AdapterTest
@@ -18,22 +19,19 @@ class SqliteAdapterTest extends AdapterTest
 
 	public function testConnectToInvalidDatabaseShouldNotCreateDbFile()
 	{
-		try
-		{
-			ActiveRecord\Connection::instance("sqlite://" . self::InvalidDb);
+		try {
+			ActiveRecord\Connection::instance('sqlite://' . self::InvalidDb);
 			$this->assertFalse(true);
-		}
-		catch (ActiveRecord\DatabaseException $e)
-		{
-			$this->assertFalse(file_exists(__DIR__ . "/" . self::InvalidDb));
+		} catch (ActiveRecord\DatabaseException $e) {
+			$this->assertFalse(file_exists(__DIR__ . '/' . self::InvalidDb));
 		}
 	}
 
 	public function test_limit_with_null_offset_does_not_contain_offset()
 	{
-		$ret = array();
+		$ret = [];
 		$sql = 'SELECT * FROM authors ORDER BY name ASC';
-		$this->conn->query_and_fetch($this->conn->limit($sql,null,1),function($row) use (&$ret) { $ret[] = $row; });
+		$this->conn->query_and_fetch($this->conn->limit($sql, null, 1), function ($row) use (&$ret) { $ret[] = $row; });
 
 		$this->assert_true(strpos($this->conn->last_query, 'LIMIT 1') !== false);
 	}
@@ -48,9 +46,9 @@ class SqliteAdapterTest extends AdapterTest
 		$columns = $this->conn->columns('amenities');
 		$this->assert_true($columns['amenity_id']->auto_increment);
 
-		// defined using int: `rm-id` INT NOT NULL
-		$columns = $this->conn->columns('`rm-bldg`');
-		$this->assert_false($columns['rm-id']->auto_increment);
+		// defined using int: `_` INT NOT NULL
+		$columns = $this->conn->columns('`rm_bldg`');
+		$this->assert_false($columns['rm_id']->auto_increment);
 
 		// defined using int: id INT NOT NULL PRIMARY KEY
 		$columns = $this->conn->columns('hosts');
@@ -60,16 +58,17 @@ class SqliteAdapterTest extends AdapterTest
 	public function test_datetime_to_string()
 	{
 		$datetime = '2009-01-01 01:01:01';
-		$this->assert_equals($datetime,$this->conn->datetime_to_string(date_create($datetime)));
+		$this->assert_equals($datetime, $this->conn->datetime_to_string(date_create($datetime)));
 	}
 
 	public function test_date_to_string()
 	{
 		$datetime = '2009-01-01';
-		$this->assert_equals($datetime,$this->conn->date_to_string(date_create($datetime)));
+		$this->assert_equals($datetime, $this->conn->date_to_string(date_create($datetime)));
 	}
 
 	// not supported
-	public function test_connect_with_port() {}
+	public function test_connect_with_port()
+	{
+	}
 }
-?>

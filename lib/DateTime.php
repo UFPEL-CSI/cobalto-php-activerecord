@@ -30,7 +30,8 @@ namespace ActiveRecord;
  *
  * @see http://php.net/manual/en/class.datetime.php
  */
-class DateTime extends \DateTime {
+class DateTime extends \DateTime
+{
 	/**
 	 * Default format used for format() and __toString().
 	 */
@@ -60,7 +61,8 @@ class DateTime extends \DateTime {
 	private $model;
 	private $attribute_name;
 
-	public function attribute_of($model, $attribute_name) {
+	public function attribute_of($model, $attribute_name)
+	{
 		$this->model = $model;
 		$this->attribute_name = $attribute_name;
 	}
@@ -81,7 +83,8 @@ class DateTime extends \DateTime {
 	 *
 	 * @return string formatted date and time string
 	 */
-	public function format($format=null) {
+	public function format($format=null)
+	{
 		return parent::format(self::get_format($format));
 	}
 
@@ -97,7 +100,8 @@ class DateTime extends \DateTime {
 	 *
 	 * @return string a format string
 	 */
-	public static function get_format($format=null) {
+	public static function get_format($format=null)
+	{
 		// use default format if no format specified
 		if (!$format) {
 			$format = self::$DEFAULT_FORMAT;
@@ -112,31 +116,38 @@ class DateTime extends \DateTime {
 		return $format;
 	}
 
-	public function __toString() {
+	public function __toString()
+	{
 		return $this->format();
 	}
 
-	public function setDate($year, $month, $day) {
+	public function setDate($year, $month, $day)
+	{
 		$this->flag_dirty();
 		call_user_func_array([$this, 'parent::setDate'], func_get_args());
 	}
 
-	public function setISODate($year, $week, $day=null) {
+	public function setISODate($year, $week, $day=null)
+	{
 		$this->flag_dirty();
 		call_user_func_array([$this, 'parent::setISODate'], func_get_args());
 	}
 
-	public function setTime($hour, $minute, $second=null, int $microsecond = null) {
+	//public function setTime($hour, $minute, $second=null, int $microsecond = null)
+	public function setTime($hour, $minute, $second=null)
+	{
 		$this->flag_dirty();
 		call_user_func_array([$this, 'parent::setTime'], func_get_args());
 	}
 
-	public function setTimestamp($unixtimestamp) {
+	public function setTimestamp($unixtimestamp)
+	{
 		$this->flag_dirty();
 		call_user_func_array([$this, 'parent::setTimestamp'], func_get_args());
 	}
 
-	private function flag_dirty() {
+	private function flag_dirty()
+	{
 		if ($this->model) {
 			$this->model->flag_dirty($this->attribute_name);
 		}
