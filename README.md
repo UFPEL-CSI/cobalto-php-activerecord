@@ -1,13 +1,6 @@
 # Cobalto ActiveRecord - Version 1.0 #
 
-All code below is based on the php-activerecord library, originally created by:
-kien la
-Jacques Fuentes
 
-* [@kla](https://github.com/kla) - Kien La
-* [@jpfuentes2](https://github.com/jpfuentes2) - Jacques Fuentes
-
-<http://www.phpactiverecord.org/>
 
 ## Introdução ##
 
@@ -25,16 +18,16 @@ Essa implementação é inspirada e, portanto, empresta muito do ActiveRecord do
 Tentamos manter suas convenções enquanto nos desviamos principalmente por conveniência ou necessidade.
 Claro, existem algumas diferenças que serão óbvias para o usuário se ele estiver familiarizado com trilhos.
 
-## Minimum Requirements ##
+### Minimum Requirements ###
 
 - PHP >=5.3 and php <= 5.6
 * Driver PDO para seu respectivo banco de dados com personalizações feitas pela equipe de desenvolvimento da ufpel
 
-## Supported Databases ##
+### Supported Databases ###
 
 - MySQL
 - PostgreSQL
-# Features ##
+### Features ###
 
 - Finder methods
 - Dynamic finder methods
@@ -47,7 +40,13 @@ Claro, existem algumas diferenças que serão óbvias para o usuário se ele est
 - Support for multiple adapters
 - Miscellaneous options such as: aliased/protected/accessible attributes
 
-### Instalação ##
+## Instalação ##
+
+```php
+composer require ufpel-csi/cobalto-php-activerecord
+```
+
+### Configuração ###
 
 A configuração é muito fácil e direta. Existem essencialmente apenas três pontos de configuração com os quais você deve se preocupar:
 
@@ -99,11 +98,14 @@ Depois de definir essas três configurações, você estará pronto. ActiveRecor
 Ele não requer que você mapeie seu esquema de tabela para arquivos yaml/xml. Ele consultará o banco de dados para obter essas informações e
 armazene-o em cache para que não faça várias chamadas ao banco de dados para um único esquema.
 
-## Test ##
-```
+## Testes ##
+```php
 composer update
 vendor/bin/phpunit -c phpunit.xml test/
 ```
+
+## Exemplos ##
+
 ### Retrieve ###
 Estes são seus métodos básicos para encontrar e recuperar registros de seu banco de dados.
 Veja a seção *Finders* para mais detalhes.
@@ -164,3 +166,14 @@ $post->delete();
 # DELETE FROM `posts` WHERE id=1
 echo $post->title; # 'New real title'
 ```
+
+## Créditos ##
+
+Todo o código abaixo é baseado na biblioteca php-activerecord, originalmente criada por:
+kien la
+Jacques Fuentes
+
+* [@kla](https://github.com/kla) - Kien La
+* [@jpfuentes2](https://github.com/jpfuentes2) - Jacques Fuentes
+
+<http://www.phpactiverecord.org/>
