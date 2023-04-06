@@ -104,7 +104,6 @@ armazene-o em cache para que não faça várias chamadas ao banco de dados para 
 
 ## Test ##
 ```
-php -r "print phpinfo();" | grep ".ini"
 composer update
 vendor/bin/phpunit -c phpunit.xml test/
 ```

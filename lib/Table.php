@@ -9,8 +9,7 @@ namespace ActiveRecord;
  * reading and writing to its database table. There is one instance of Table
  * for every table you have a model for.
  */
-class Table
-{
+class Table {
 	public $class;
 	public $conn;
 	public $pk;
@@ -49,8 +48,7 @@ class Table
 	 */
 	private $relationships = [];
 
-	public static function load($model_class_name)
-	{
+	public static function load($model_class_name) {
 		if (!isset(self::$cache[$model_class_name])) {
 			/* do not place set_assoc in constructor..it will lead to infinite loop due to
 			   relationships requesting the model's table, but the cache hasn't been set yet */
@@ -61,8 +59,7 @@ class Table
 		return self::$cache[$model_class_name];
 	}
 
-	public static function clear_cache($model_class_name=null)
-	{
+	public static function clear_cache($model_class_name=null) {
 		if ($model_class_name && array_key_exists($model_class_name, self::$cache)) {
 			unset(self::$cache[$model_class_name]);
 		} else {
@@ -70,8 +67,7 @@ class Table
 		}
 	}
 
-	public function __construct($class_name)
-	{
+	public function __construct($class_name) {
 		$this->class = Reflections::instance()->add($class_name)->get($class_name);
 
 		$this->reestablish_connection(false);
@@ -87,8 +83,7 @@ class Table
 		$this->callback->register('after_save', function (Model $model) { $model->reset_dirty(); }, ['prepend' => true]);
 	}
 
-	public function reestablish_connection($close=true)
-	{
+	public function reestablish_connection($close=true) {
 		// if connection name property is null the connection manager will use the default connection
 		$connection = $this->class->getStaticPropertyValue('connection', null);
 
@@ -99,8 +94,7 @@ class Table
 		return $this->conn = ConnectionManager::get_connection($connection);
 	}
 
-	public function create_joins($joins)
-	{
+	public function create_joins($joins) {
 		if (!is_array($joins)) {
 			return $joins;
 		}
@@ -146,8 +140,7 @@ class Table
 		return $ret;
 	}
 
-	public function options_to_sql($options)
-	{
+	public function options_to_sql($options) {
 		$table = array_key_exists('from', $options) ? $options['from'] : $this->get_fully_qualified_table_name();
 		$sql = new SQLBuilder($this->conn, $table);
 
@@ -203,8 +196,7 @@ class Table
 		return $sql;
 	}
 
-	public function find($options)
-	{
+	public function find($options) {
 		$sql = $this->options_to_sql($options);
 		$readonly = (array_key_exists('readonly', $options) && $options['readonly']) ? true : false;
 		$eager_load = array_key_exists('include', $options) ? $options['include'] : null;
@@ -212,8 +204,7 @@ class Table
 		return $this->find_by_sql($sql->to_s(), $sql->get_where_values(), $readonly, $eager_load);
 	}
 
-	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null)
-	{
+	public function find_by_sql($sql, $values=null, $readonly=false, $includes=null) {
 		$this->last_sql = $sql;
 
 		$collect_attrs_for_includes = is_null($includes) ? false : true;
@@ -241,8 +232,7 @@ class Table
 		return $list;
 	}
 
-	public function get_column_by_inflected_name($inflected_name)
-	{
+	public function get_column_by_inflected_name($inflected_name) {
 		foreach ($this->columns as $raw_name => $column) {
 			if ($column->inflected_name == $inflected_name) {
 				return $column;
@@ -255,8 +245,7 @@ class Table
 	 * Change by beautiful team of CTI - UFPel
 	 * Original $quote_name = true.
 	 */
-	public function get_fully_qualified_table_name($quote_name=false)
-	{
+	public function get_fully_qualified_table_name($quote_name=false) {
 		$table = $quote_name ? $this->conn->quote_name($this->table) : $this->table;
 
 		if ($this->db_name) {
@@ -277,8 +266,7 @@ class Table
 	 *
 	 * @return Relationship or null
 	 */
-	public function get_relationship($name, $strict=false)
-	{
+	public function get_relationship($name, $strict=false) {
 		if ($this->has_relationship($name)) {
 			return $this->relationships[$name];
 		}
@@ -297,13 +285,11 @@ class Table
 	 *
 	 * @return bool
 	 */
-	public function has_relationship($name)
-	{
+	public function has_relationship($name) {
 		return array_key_exists($name, $this->relationships);
 	}
 
-	public function insert(&$data, $pk=null, $sequence_name=null)
-	{
+	public function insert(&$data, $pk=null, $sequence_name=null) {
 		$data = $this->process_data($data);
 
 		$sql = new SQLBuilder($this->conn, $this->get_fully_qualified_table_name());
@@ -313,8 +299,7 @@ class Table
 		return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
 	}
 
-	public function update(&$data, $where)
-	{
+	public function update(&$data, $where) {
 		$data = $this->process_data($data);
 
 		$sql = new SQLBuilder($this->conn, $this->get_fully_qualified_table_name());
@@ -324,8 +309,7 @@ class Table
 		return $this->conn->query(($this->last_sql = $sql->to_s()), $values);
 	}
 
-	public function delete($data)
-	{
+	public function delete($data) {
 		$data = $this->process_data($data);
 
 		$sql = new SQLBuilder($this->conn, $this->get_fully_qualified_table_name());
@@ -342,8 +326,7 @@ class Table
 	 * @param $attrs array of attrs from $models
 	 * @param $includes array eager load directives
 	 */
-	private function execute_eager_load($models=[], $attrs=[], $includes=[])
-	{
+	private function execute_eager_load($models=[], $attrs=[], $includes=[]) {
 		if (!is_array($includes)) {
 			$includes = [$includes];
 		}
@@ -367,13 +350,11 @@ class Table
 	 *
 	 * @param Relationship $relationship a Relationship object
 	 */
-	private function add_relationship($relationship)
-	{
+	private function add_relationship($relationship) {
 		$this->relationships[$relationship->attribute_name] = $relationship;
 	}
 
-	private function get_meta_data()
-	{
+	private function get_meta_data() {
 		// as more adapters are added probably want to do this a better way
 		// than using instanceof but gud enuff for now
 		$quote_name = !($this->conn instanceof PgsqlAdapter);
@@ -391,8 +372,7 @@ class Table
 	 *
 	 * @return array Array with any aliases replaced with their read field name
 	 */
-	private function map_names(&$hash, &$map)
-	{
+	private function map_names(&$hash, &$map) {
 		$ret = [];
 
 		foreach ($hash as $name => &$value) {
@@ -405,8 +385,7 @@ class Table
 		return $ret;
 	}
 
-	private function &process_data($hash)
-	{
+	private function &process_data($hash) {
 		if (!$hash) {
 			return $hash;
 		}
@@ -425,8 +404,7 @@ class Table
 		return $hash;
 	}
 
-	private function set_primary_key()
-	{
+	private function set_primary_key() {
 		if (($pk = $this->class->getStaticPropertyValue('pk', null)) || ($pk = $this->class->getStaticPropertyValue('primary_key', null))) {
 			$this->pk = is_array($pk) ? $pk : [$pk];
 		} else {
@@ -440,8 +418,7 @@ class Table
 		}
 	}
 
-	private function set_table_name()
-	{
+	private function set_table_name() {
 		if (($table = $this->class->getStaticPropertyValue('table', null)) || ($table = $this->class->getStaticPropertyValue('table_name', null))) {
 			$this->table = $table;
 		} else {
@@ -458,8 +435,7 @@ class Table
 		}
 	}
 
-	private function set_sequence_name()
-	{
+	private function set_sequence_name() {
 		if (!$this->conn->supports_sequences()) {
 			return;
 		}
@@ -471,8 +447,7 @@ class Table
 		}
 	}
 
-	private function set_associations()
-	{
+	private function set_associations() {
 		require_once 'Relationship.php';
 		$namespace = $this->class->getNamespaceName();
 
@@ -518,8 +493,7 @@ class Table
 	 *       'to'       => 'delegate_to_relationship',
 	 *       'prefix'	=> 'prefix')
 	 */
-	private function set_delegates()
-	{
+	private function set_delegates() {
 		$delegates = $this->class->getStaticPropertyValue('delegate', []);
 		$new = [];
 
@@ -540,7 +514,7 @@ class Table
 				$new_delegate = [
 					'to'		=> $delegate['to'],
 					'prefix'	=> $delegate['prefix'],
-					'delegate'	=> []];
+					'delegate'	=> [], ];
 
 				foreach ($delegate as $name => $value) {
 					if (is_numeric($name)) {
@@ -559,8 +533,7 @@ class Table
 	/**
 	 * @deprecated Model.php now checks for get|set_ methods via method_exists so there is no need for declaring static g|setters.
 	 */
-	private function set_setters_and_getters()
-	{
+	private function set_setters_and_getters() {
 		$getters = $this->class->getStaticPropertyValue('getters', []);
 		$setters = $this->class->getStaticPropertyValue('setters', []);
 
