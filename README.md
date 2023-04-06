@@ -33,10 +33,7 @@ Claro, existem algumas diferenças que serão óbvias para o usuário se ele est
 ## Supported Databases ##
 
 - MySQL
-- SQLite
 - PostgreSQL
-- Oracle
-
 # Features ##
 
 - Finder methods

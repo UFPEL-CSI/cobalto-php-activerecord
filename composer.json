@@ -1,12 +1,14 @@
 {
     "name": "ufpel-csi/cobalto-php-activerecord",
+    "version": "1.0.0-stable",
     "type": "library",
-    "description": "cobalto-php-activerecord is an open source ORM library based on the ActiveRecord pattern.",
+    "description": "cobalto-php-activerecord is an open source ORM library  for mysql and postgres based on the ActiveRecord pattern.",
     "keywords": [
         "activerecord",
         "orm"
     ],
-    "homepage": "http://www.phpactiverecord.org/",
+    "homepage": "https://github.com/UFPEL-CSI/cobalto-php-activerecord",
+    "minimum-stability": "stable",
     "license": "MIT",
     "require": {
         "php": "<=5.6.40"
