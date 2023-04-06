@@ -1,6 +1,5 @@
 {
     "name": "ufpel-csi/cobalto-php-activerecord",
-    "version": "1.0.0",
     "type": "library",
     "description": "cobalto-php-activerecord is an open source ORM library  for mysql and postgres based on the ActiveRecord pattern.",
     "keywords": [
