@@ -80,7 +80,7 @@ index abcdefg..abcdefh 100644
 --- a/Test.txt
 +++ b/Test.txt
 @@ -49,9 +49,8 @@
- A
+A
 -B
 A;
         $diffs = $this->parser->parse($content);
@@ -123,7 +123,7 @@ index abcdefg..abcdefh 100644
 --- a/Test.txt
 +++ b/Test.txt
 @@ -1,3 +1,2 @@
- A
+A
 -B
 
 diff --git a/Test123.txt b/Test123.txt
@@ -131,7 +131,7 @@ index abcdefg..abcdefh 100644
 --- a/Test2.txt
 +++ b/Test2.txt
 @@ -1,2 +1,3 @@
- A
+A
 +B
 A;
         $diffs = $this->parser->parse($content);

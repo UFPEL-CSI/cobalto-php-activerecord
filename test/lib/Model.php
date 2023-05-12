@@ -418,7 +418,8 @@ class Model {
 
 		foreach (static::$delegate as &$item) {
 			if (($delegated_name = $this->is_delegated($name, $item))) {
-				return $this->$item['to']->$delegated_name = $value;
+				$a = ($this->$item);
+				return $a['to']->$delegated_name = $value;
 			}
 		}
 
@@ -1310,7 +1311,7 @@ class Model {
 
 		$args = func_get_args();
 		$options = static::extract_and_validate_options($args);
-		$num_args = count($args);
+		$num_args = count($args);test/lib/Model.php
 		$single = true;
 
 		if ($num_args > 0 && ($args[0] === 'all' || $args[0] === 'first' || $args[0] === 'last')) {

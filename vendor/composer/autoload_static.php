@@ -4,11 +4,10 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit12bd8d233fe248b8825003b68fb59100
+class ComposerStaticInit64794fc71806645f379e0dd57ffa31ed
 {
     public static $files = array (
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '8248dca4422a3d0411471011b63e26c6' => __DIR__ . '/../..' . '/ActiveRecord.php',
     );
 
@@ -23,24 +22,16 @@ class ComposerStaticInit12bd8d233fe248b8825003b68fb59100
         ),
         'S' => 
         array (
-            'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Component\\Yaml\\' => 23,
-            'Symfony\\Component\\Debug\\' => 24,
-            'Symfony\\Component\\Console\\' => 26,
         ),
         'P' => 
         array (
-            'Psr\\Log\\' => 8,
             'Prophecy\\' => 9,
         ),
         'D' => 
         array (
             'Doctrine\\Instantiator\\' => 22,
-            'Doctrine\\Common\\Lexer\\' => 22,
-            'Doctrine\\Common\\Cache\\' => 22,
-            'Doctrine\\Common\\Annotations\\' => 28,
-            'Doctrine\\Common\\' => 16,
         ),
     );
 
@@ -48,16 +39,12 @@ class ComposerStaticInit12bd8d233fe248b8825003b68fb59100
         'phpDocumentor\\Reflection\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
-            1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
-            2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
+            1 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
+            2 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
         ),
         'Webmozart\\Assert\\' => 
         array (
             0 => __DIR__ . '/..' . '/webmozart/assert/src',
-        ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
         'Symfony\\Polyfill\\Ctype\\' => 
         array (
@@ -67,18 +54,6 @@ class ComposerStaticInit12bd8d233fe248b8825003b68fb59100
         array (
             0 => __DIR__ . '/..' . '/symfony/yaml',
         ),
-        'Symfony\\Component\\Debug\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/debug',
-        ),
-        'Symfony\\Component\\Console\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/console',
-        ),
-        'Psr\\Log\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
-        ),
         'Prophecy\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpspec/prophecy/src/Prophecy',
@@ -86,44 +61,6 @@ class ComposerStaticInit12bd8d233fe248b8825003b68fb59100
         'Doctrine\\Instantiator\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/instantiator/src/Doctrine/Instantiator',
-        ),
-        'Doctrine\\Common\\Lexer\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/doctrine/lexer/lib/Doctrine/Common/Lexer',
-        ),
-        'Doctrine\\Common\\Cache\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/doctrine/cache/lib/Doctrine/Common/Cache',
-        ),
-        'Doctrine\\Common\\Annotations\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/doctrine/annotations/lib/Doctrine/Common/Annotations',
-        ),
-        'Doctrine\\Common\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/doctrine/common/lib/Doctrine/Common',
-        ),
-    );
-
-    public static $prefixesPsr0 = array (
-        'D' => 
-        array (
-            'Doctrine\\ORM\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/doctrine/orm/lib',
-            ),
-            'Doctrine\\DBAL\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/doctrine/dbal/lib',
-            ),
-            'Doctrine\\Common\\Inflector\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/doctrine/inflector/lib',
-            ),
-            'Doctrine\\Common\\Collections\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/doctrine/collections/lib',
-            ),
         ),
     );
 
@@ -579,10 +516,9 @@ class ComposerStaticInit12bd8d233fe248b8825003b68fb59100
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit12bd8d233fe248b8825003b68fb59100::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit12bd8d233fe248b8825003b68fb59100::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit12bd8d233fe248b8825003b68fb59100::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit12bd8d233fe248b8825003b68fb59100::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit64794fc71806645f379e0dd57ffa31ed::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit64794fc71806645f379e0dd57ffa31ed::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit64794fc71806645f379e0dd57ffa31ed::$classMap;
 
         }, null, ClassLoader::class);
     }
