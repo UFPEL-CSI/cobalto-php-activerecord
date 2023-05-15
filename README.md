@@ -1,6 +1,4 @@
-# Cobalto ActiveRecord - Version 1.0.2 #
-
-
+# Cobalto ActiveRecord - Version 2.0.0-rc #
 
 ## Introdução ##
 
@@ -20,7 +18,7 @@ Claro, existem algumas diferenças que serão óbvias para o usuário se ele est
 
 ### Minimum Requirements ###
 
-- PHP >=5.3 and php <= 5.6
+- PHP = 7.0.0
 * Driver PDO para seu respectivo banco de dados com personalizações feitas pela equipe de desenvolvimento da ufpel
 
 ### Supported Databases ###
@@ -68,20 +66,6 @@ ActiveRecord\Config::initialize(function($cfg)
      )
    );
 });
-```
-
-Alternatively (w/o the 5.3 closure):
-
-```php
-$cfg = ActiveRecord\Config::instance();
-$cfg->set_model_directory('/path/to/your/model_directory');
-$cfg->set_connections(
-  array(
-    'development' => 'mysql://username:password@localhost/development_database_name',
-    'test' => 'mysql://username:password@localhost/test_database_name',
-    'production' => 'mysql://username:password@localhost/production_database_name'
-  )
-);
 ```
 
 O PHP ActiveRecord será o padrão para usar seu banco de dados de desenvolvimento. Para teste ou produção, basta definir o padrão
