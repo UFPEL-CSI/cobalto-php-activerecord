@@ -134,7 +134,7 @@ class DateTime extends \DateTime
 	}
 
 	//public function setTime($hour, $minute, $second=null)
-	public function setTime($hour, $minute, $second=null, int $microsecond = null)
+	public function setTime($hour, $minute, $second=null, $microsecond = null)
 	{
 		$this->flag_dirty();
 		call_user_func_array([$this, 'parent::setTime'], func_get_args());
