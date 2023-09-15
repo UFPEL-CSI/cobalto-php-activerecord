@@ -242,8 +242,8 @@ class Validations
 	 * @see validates_inclusion_of
 	 * @see validates_exclusion_of
 	 *
-	 * @param string $type Either inclusion or exclusion
-	 * @param $attrs Validation definition
+	 * @param string $type  Either inclusion or exclusion
+	 * @param        $attrs Validation definition
 	 */
 	public function validates_inclusion_or_exclusion_of($type, $attrs)
 	{
@@ -412,7 +412,7 @@ class Validations
 			$attribute = $options[0];
 			$var = $this->model->$attribute;
 
-			if (is_null($options['with']) || !is_string($options['with']) || !is_string($options['with'])) {
+			if (is_null($options['with']) || !is_string($options['with'])) {
 				throw new ValidationsArgumentError('A regular expression must be supplied as the [with] option of the configuration array.');
 			} else {
 				$expression = $options['with'];
@@ -485,7 +485,7 @@ class Validations
 				$range = $options[$range_options[0]];
 
 				if (!(Utils::is_a('range', $range))) {
-					throw new  ValidationsArgumentError("$range_option must be an array composing a range of numbers with key [0] being less than key [1]");
+					throw new  ValidationsArgumentError("$range_options[0] must be an array composing a range of numbers with key [0] being less than key [1]");
 				}
 				$range_options = ['minimum', 'maximum'];
 				$attr['minimum'] = $range[0];
@@ -567,8 +567,7 @@ class Validations
 		foreach ($attrs as $attr) {
 			$options = array_merge($configuration, $attr);
 			$pk = $this->model->get_primary_key();
-			$a = $this->model->$pk;
-			$pk_value = $a[0];
+			$pk_value = $this->model->{is_array($pk) ? $pk[0] : $pk};
 
 			if (is_array($options[0])) {
 				$add_record = join('_and_', $options[0]);
@@ -814,9 +813,9 @@ class Errors implements IteratorAggregate
 	 * # )
 	 * </code>
 	 *
-	 * @param array $closure closure to fetch the errors in some other format (optional)
-	 *                       This closure has the signature function($attribute, $message)
-	 *                       and is called for each available error message
+	 * @param callable $closure closure to fetch the errors in some other format (optional)
+	 *                          This closure has the signature function($attribute, $message)
+	 *                          and is called for each available error message
 	 *
 	 * @return array
 	 */

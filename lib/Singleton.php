@@ -8,7 +8,8 @@ namespace ActiveRecord;
  * a singleton pattern is capable of being achieved; however, multiple instantiations are also
  * possible. This allows the user more freedom with this pattern.
  */
-abstract class Singleton {
+abstract class Singleton
+{
 	/**
 	 * Array of cached singleton objects.
 	 *
@@ -21,7 +22,8 @@ abstract class Singleton {
 	 *
 	 * @return object
 	 */
-	final public static function instance() {
+	final public static function instance()
+	{
 		$class_name = get_called_class();
 
 		if (!isset(self::$instances[$class_name])) {
@@ -32,18 +34,20 @@ abstract class Singleton {
 	}
 
 	/**
-	 * Singleton objects should not be cloned.
-	 */
-	final public function __clone() {
-	}
-
-	/**
 	 * Similar to a get_called_class() for a child class to invoke.
 	 *
 	 * @return string
 	 */
-	final protected function get_called_class() {
+	final protected function get_called_class()
+	{
 		$backtrace = debug_backtrace();
 		return get_class($backtrace[2]['object']);
+	}
+
+	/**
+	 * Singleton objects should not be cloned.
+	 */
+	final private function __clone()
+	{
 	}
 }

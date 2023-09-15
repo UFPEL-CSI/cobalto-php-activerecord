@@ -116,6 +116,20 @@ class Model
 	public static $sequence;
 
 	/**
+	 * Set this to true in your subclass to use caching for this model.
+	 * Note that you must also configure a cache object.
+	 */
+	public static $cache = false;
+
+	/**
+	 * Set this to specify an expiration period for this model.
+	 * If not set, the expire value you set in your cache options will be used.
+	 *
+	 * @var int
+	 */
+	public static $cache_expire;
+
+	/**
 	 * Allows you to create aliases for attributes.
 	 *
 	 * <code>
@@ -204,14 +218,7 @@ class Model
 	 *
 	 * @var array
 	 */
-	protected $attributes = [];
-
-	/**
-	 * Flag that determines if a call to save() should issue an insert or an update sql statement.
-	 *
-	 * @var bool
-	 */
-	protected $__new_record = true;
+	private $attributes = [];
 
 	/**
 	 * Flag whether or not this model's attributes have been modified since it will either be null or an array of column_names that have been modified.
@@ -233,6 +240,13 @@ class Model
 	 * @var array
 	 */
 	private $__relationships = [];
+
+	/**
+	 * Flag that determines if a call to save() should issue an insert or an update sql statement.
+	 *
+	 * @var bool
+	 */
+	private $__new_record = true;
 
 	/**
 	 * Constructs a model.
@@ -423,8 +437,7 @@ class Model
 
 		foreach (static::$delegate as &$item) {
 			if (($delegated_name = $this->is_delegated($name, $item))) {
-				$a = ($this->$item);
-				return $a['to']->$delegated_name = $value;
+				return $this->{$item['to']}->{$delegated_name} = $value;
 			}
 		}
 
@@ -461,12 +474,19 @@ class Model
 
 		// convert php's \DateTime to ours
 		if ($value instanceof \DateTime) {
-			$value = new DateTime($value->format('Y-m-d H:i:s T'));
+			$date_class = Config::instance()->get_date_class();
+			if (!($value instanceof $date_class)) {
+				$value = $date_class::createFromFormat(
+					Connection::DATETIME_TRANSLATE_FORMAT,
+					$value->format(Connection::DATETIME_TRANSLATE_FORMAT),
+					$value->getTimezone()
+				);
+			}
 		}
 
-		// make sure DateTime values know what model they belong to so
-		// dirty stuff works when calling set methods on the DateTime object
-		if ($value instanceof DateTime) {
+		if ($value instanceof DateTimeInterface) {
+			// Tell the Date object that it's associated with this model and attribute. This is so it
+			// has the ability to flag this model as dirty if a field in the Date object changes.
 			$value->attribute_of($this, $name);
 		}
 
@@ -740,15 +760,16 @@ class Model
 	/**
 	 * Creates a model and saves it to the database.
 	 *
-	 * @param array $attributes Array of the models attributes
-	 * @param bool  $validate   True if the validators should be run
+	 * @param array $attributes       Array of the models attributes
+	 * @param bool  $validate         True if the validators should be run
+	 * @param bool  $guard_attributes Set to true to guard protected/non-accessible attributes
 	 *
 	 * @return Model
 	 */
-	public static function create($attributes, $validate=true)
+	public static function create($attributes, $validate=true, $guard_attributes=true)
 	{
 		$class_name = get_called_class();
-		$model = new $class_name($attributes);
+		$model = new $class_name($attributes, $guard_attributes);
 		$model->save($validate);
 		return $model;
 	}
@@ -792,7 +813,7 @@ class Model
 	 * Delete all using a string:
 	 *
 	 * <code>
-	 * YourModel::delete_all(array('conditions' => 'name = "Tito"));
+	 * YourModel::delete_all(array('conditions' => 'name = "Tito"'));
 	 * </code>
 	 *
 	 * An options array takes the following parameters:
@@ -889,6 +910,7 @@ class Model
 		$values = $sql->bind_values();
 		$ret = $conn->query(($table->last_sql = $sql->to_s()), $values);
 		return $ret->rowCount();
+
 	}
 
 	/**
@@ -912,6 +934,7 @@ class Model
 
 		static::table()->delete($pk);
 		$this->invoke_callback('after_destroy', false);
+		$this->expire_cache();
 
 		return true;
 	}
@@ -985,7 +1008,6 @@ class Model
 	{
 		$now = date('Y-m-d H:i:s');
 
-
 		if (isset($this->updated_at)) {
 			$this->updated_at = $now;
 		}
@@ -1043,7 +1065,7 @@ class Model
 	 * @internal This should <strong>only</strong> be used by eager load
 	 *
 	 * @param Model $model
-	 * @param $name of relationship for this table
+	 * @param       $name  of relationship for this table
 	 */
 	public function set_relationship_from_eager_load(self $model=null, $name)
 	{
@@ -1075,6 +1097,7 @@ class Model
 		$this->__relationships = [];
 		$pk = array_values($this->get_values_for($this->get_primary_key()));
 
+		$this->expire_cache();
 		$this->set_attributes_via_mass_assignment($this->find($pk)->attributes, false);
 		$this->reset_dirty();
 
@@ -1417,22 +1440,30 @@ class Model
 	 */
 	public static function find_by_pk($values, $options)
 	{
-		$options['conditions'] = static::pk_conditions($values);
-		$list = static::table()->find($options);
+		if($values===null) {
+			throw new RecordNotFound("Couldn't find " . get_called_class() . ' without an ID');
+		}
+
+		$table = static::table();
+
+		if($table->cache_individual_model) {
+			$list = static::get_models_from_cache($values, $options);
+		} else {
+			$options['conditions'] = static::pk_conditions($values);
+			$list = $table->find($options);
+		}
 		$results = count($list);
 
 		if ($results != ($expected = count($values))) {
 			$class = get_called_class();
-
-			if ($expected == 1) {
-				if (!is_array($values)) {
-					$values = [$values];
-				}
-
-				throw new RecordNotFound("Couldn't find $class with ID=" . join(',', $values));
+			if (is_array($values)) {
+				$values = join(',', $values);
 			}
 
-			$values = join(',', $values);
+			if ($expected == 1) {
+				throw new RecordNotFound("Couldn't find $class with ID=$values");
+			}
+
 			throw new RecordNotFound("Couldn't find all $class with IDs ($values) (found $results, but was looking for $expected)");
 		}
 		return $expected == 1 ? $list[0] : $list;
@@ -1574,32 +1605,32 @@ class Model
 		return $this->serialize('Xml', $options);
 	}
 
-  /**
-   * Returns an CSV representation of this model.
-   * Can take optional delimiter and enclosure
-   * (defaults are , and double quotes).
-   *
-   * Ex:
-   * <code>
-   * ActiveRecord\CsvSerializer::$delimiter=';';
-   * ActiveRecord\CsvSerializer::$enclosure='';
-   * YourModel::find('first')->to_csv(array('only'=>array('name','level')));
-   * returns: Joe,2
-   *
-   * YourModel::find('first')->to_csv(array('only_header'=>true,'only'=>array('name','level')));
-   * returns: name,level
-   * </code>
-   *
-   * @see Serialization
-   *
-   * @param array $options An array containing options for csv serialization (see {@link Serialization} for valid options)
-   *
-   * @return string CSV representation of the model
-   */
-  public function to_csv(array $options=[])
-  {
-  	return $this->serialize('Csv', $options);
-  }
+	/**
+	 * Returns an CSV representation of this model.
+	 * Can take optional delimiter and enclosure
+	 * (defaults are , and double quotes).
+	 *
+	 * Ex:
+	 * <code>
+	 * ActiveRecord\CsvSerializer::$delimiter=';';
+	 * ActiveRecord\CsvSerializer::$enclosure='';
+	 * YourModel::find('first')->to_csv(array('only'=>array('name','level')));
+	 * returns: Joe,2
+	 *
+	 * YourModel::find('first')->to_csv(array('only_header'=>true,'only'=>array('name','level')));
+	 * returns: name,level
+	 * </code>
+	 *
+	 * @see Serialization
+	 *
+	 * @param array $options An array containing options for csv serialization (see {@link Serialization} for valid options)
+	 *
+	 * @return string CSV representation of the model
+	 */
+	public function to_csv(array $options=[])
+	{
+		return $this->serialize('Csv', $options);
+	}
 
 	/**
 	 * Returns an Array representation of this model.
@@ -1643,7 +1674,7 @@ class Model
 	 * });
 	 * </code>
 	 *
-	 * @param Closure $closure The closure to execute. To cause a rollback have your closure return false or throw an exception.
+	 * @param callable $closure The closure to execute. To cause a rollback have your closure return false or throw an exception.
 	 *
 	 * @return bool true if the transaction was committed, False if rolled back
 	 */
@@ -1667,31 +1698,44 @@ class Model
 		return true;
 	}
 
-	/**
-	 * Throws an exception if this model is set to readonly.
-	 *
-	 * @throws ActiveRecord\ReadOnlyException
-	 *
-	 * @param string $method_name Name of method that was invoked on model for exception message
-	 */
-	protected function verify_not_readonly($method_name)
+	protected function expire_cache()
 	{
-		if ($this->is_readonly()) {
-			throw new ReadOnlyException(get_class($this), $method_name);
+		$table = static::table();
+		if($table->cache_individual_model) {
+			Cache::delete($this->cache_key());
 		}
 	}
 
-	/**
-	 * Invokes the specified callback on this model.
-	 *
-	 * @param string $method_name name of the call back to run
-	 * @param bool   $must_exist  set to true to raise an exception if the callback does not exist
-	 *
-	 * @return bool True if invoked or null if not
-	 */
-	protected function invoke_callback($method_name, $must_exist=true)
+	protected function cache_key()
 	{
-		return static::table()->callback->invoke($this, $method_name, $must_exist);
+		$table = static::table();
+		return $table->cache_key_for_model($this->values_for_pk());
+	}
+
+	/**
+	 * Will look up a list of primary keys from cache.
+	 *
+	 * @param mixed $pks primary keys
+	 *
+	 * @return array
+	 */
+	protected static function get_models_from_cache($pks, $options)
+	{
+		$models = [];
+		$table = static::table();
+
+		if(!is_array($pks)) {
+			$pks = [$pks];
+		}
+
+		foreach($pks as $pk) {
+			$options['conditions'] = static::pk_conditions($pk);
+			$models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
+				$res = $table->find($options);
+				return $res ? $res[0] : null;
+			}, $table->cache_model_expire);
+		}
+		return array_filter($models);
 	}
 
 	/**
@@ -1714,6 +1758,20 @@ class Model
 		}
 
 		return null;
+	}
+
+	/**
+	 * Throws an exception if this model is set to readonly.
+	 *
+	 * @throws \ActiveRecord\ReadOnlyException
+	 *
+	 * @param string $method_name Name of method that was invoked on model for exception message
+	 */
+	private function verify_not_readonly($method_name)
+	{
+		if ($this->is_readonly()) {
+			throw new ReadOnlyException(get_class($this), $method_name);
+		}
 	}
 
 	/**
@@ -1774,6 +1832,7 @@ class Model
 
 		$this->__new_record = false;
 		$this->invoke_callback('after_create', false);
+		$this->expire_cache();
 		return true;
 	}
 
@@ -1808,6 +1867,7 @@ class Model
 			$dirty = $this->dirty_attributes();
 			static::table()->update($dirty, $pk);
 			$this->invoke_callback('after_update', false);
+			$this->expire_cache();
 		}
 
 		return true;
@@ -1825,8 +1885,6 @@ class Model
 		$validator = new Validations($this);
 		$validation_on = 'validation_on_' . ($this->is_new_record() ? 'create' : 'update');
 
-		$this->errors = $validator->get_record();
-
 		foreach (['before_validation', "before_$validation_on"] as $callback) {
 			if (!$this->invoke_callback($callback, false)) {
 				return false;
@@ -1834,6 +1892,7 @@ class Model
 		}
 
 		// need to store reference b4 validating so that custom validators have access to add errors
+		$this->errors = $validator->get_record();
 		$validator->validate();
 
 		foreach (['after_validation', "after_$validation_on"] as $callback) {
@@ -1850,7 +1909,7 @@ class Model
 	/**
 	 * Passing $guard_attributes as true will throw an exception if an attribute does not exist.
 	 *
-	 * @throws ActiveRecord\UndefinedPropertyException
+	 * @throws \ActiveRecord\UndefinedPropertyException
 	 *
 	 * @param array $attributes       An array in the form array(name => value, ...)
 	 * @param bool  $guard_attributes Flag of whether or not protected/non-accessible attributes should be guarded
@@ -1926,5 +1985,18 @@ class Model
 		$class = "ActiveRecord\\{$type}Serializer";
 		$serializer = new $class($this, $options);
 		return $serializer->to_s();
+	}
+
+	/**
+	 * Invokes the specified callback on this model.
+	 *
+	 * @param string $method_name name of the call back to run
+	 * @param bool   $must_exist  set to true to raise an exception if the callback does not exist
+	 *
+	 * @return bool True if invoked or null if not
+	 */
+	private function invoke_callback($method_name, $must_exist=true)
+	{
+		return static::table()->callback->invoke($this, $method_name, $must_exist);
 	}
 }

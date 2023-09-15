@@ -187,7 +187,7 @@ class CallBack
 			{
 				$ret = ($method instanceof Closure ? $method($model) : $model->$method());
 
-				if (false === $ret)
+				if (false === $ret && $first === 'before')
 					return false;
 			}
 		}
@@ -249,4 +249,3 @@ class CallBack
 			$this->registry[$name][] = $closure_or_method_name;
 	}
 }
-?>

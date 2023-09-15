@@ -1,4 +1,4 @@
-# Cobalto ActiveRecord - Version 2.0.0-rc.1 #
+# Cobalto ActiveRecord - Version 2.0.0-rc #
 
 ## Introdução ##
 
@@ -18,7 +18,7 @@ Claro, existem algumas diferenças que serão óbvias para o usuário se ele est
 
 ### Minimum Requirements ###
 
-- PHP >= 7.0.0 and <= 7.2.0
+- PHP = 7.0.0
 * Driver PDO para seu respectivo banco de dados com personalizações feitas pela equipe de desenvolvimento da ufpel
 
 ### Supported Databases ###

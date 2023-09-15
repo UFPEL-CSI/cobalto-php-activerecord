@@ -11,7 +11,19 @@ use Closure;
 /**
  * The base class for database connection adapters.
  */
-abstract class Connection {
+abstract class Connection
+{
+	/**
+	 * The DateTime format to use when translating other DateTime-compatible objects.
+	 *
+	 * NOTE!: The DateTime "format" used must not include a time-zone (name, abbreviation, etc) or offset.
+	 * Including one will cause PHP to ignore the passed in time-zone in the 3rd argument.
+	 * See bug: https://bugs.php.net/bug.php?id=61022
+	 *
+	 * @var string
+	 */
+	const DATETIME_TRANSLATE_FORMAT = 'Y-m-d\TH:i:s';
+
 	/**
 	 * The PDO connection object.
 	 *
@@ -41,7 +53,7 @@ abstract class Connection {
 	 *
 	 * @var string
 	 */
-	public static $datetime_format = 'Y-m-d H:i:s';
+	public static $datetime_format = 'Y-m-d H:i:s T';
 	/**
 	 * Default PDO options to set for each connection.
 	 *
@@ -51,7 +63,7 @@ abstract class Connection {
 		PDO::ATTR_CASE => PDO::CASE_LOWER,
 		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 		PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-		PDO::ATTR_STRINGIFY_FETCHES => false, ];
+		PDO::ATTR_STRINGIFY_FETCHES => false];
 	/**
 	 * The quote character for stuff like column and field names.
 	 *
@@ -90,7 +102,8 @@ abstract class Connection {
 	 *
 	 * @see parse_connection_url
 	 */
-	public static function instance($connection_string_or_connection_name=null) {
+	public static function instance($connection_string_or_connection_name=null)
+	{
 		$config = Config::instance();
 
 		if (strpos($connection_string_or_connection_name, '://') === false) {
@@ -146,7 +159,8 @@ abstract class Connection {
 	 *
 	 * @return object the parsed URL as an object
 	 */
-	public static function parse_connection_url($connection_url) {
+	public static function parse_connection_url($connection_url)
+	{
 		$url = @parse_url($connection_url);
 
 		if (!isset($url['host'])) {
@@ -218,7 +232,8 @@ abstract class Connection {
 	 *
 	 * @return array an array of {@link Column} objects
 	 */
-	public function columns($table) {
+	public function columns($table)
+	{
 		$columns = [];
 		$sth = $this->query_column_info($table);
 
@@ -236,7 +251,8 @@ abstract class Connection {
 	 *
 	 * @return string the string with any quotes in it properly escaped
 	 */
-	public function escape($string) {
+	public function escape($string)
+	{
 		return $this->connection->quote($string);
 	}
 
@@ -247,7 +263,8 @@ abstract class Connection {
 	 *
 	 * @return int
 	 */
-	public function insert_id($sequence=null) {
+	public function insert_id($sequence=null)
+	{
 		return $this->connection->lastInsertId($sequence);
 	}
 
@@ -259,7 +276,8 @@ abstract class Connection {
 	 *
 	 * @return mixed A result set object
 	 */
-	public function query($sql, &$values=[]) {
+	public function query($sql, &$values=[])
+	{
 		if ($this->logging) {
 			$this->logger->log($sql);
 			if ($values) {
@@ -297,7 +315,8 @@ abstract class Connection {
 	 *
 	 * @return string
 	 */
-	public function query_and_fetch_one($sql, &$values=[]) {
+	public function query_and_fetch_one($sql, &$values=[])
+	{
 		$sth = $this->query($sql, $values);
 		$row = $sth->fetch(PDO::FETCH_NUM);
 		return $row[0];
@@ -309,7 +328,8 @@ abstract class Connection {
 	 * @param string  $sql     raw SQL string to execute
 	 * @param Closure $handler closure that will be passed the fetched results
 	 */
-	public function query_and_fetch($sql, Closure $handler) {
+	public function query_and_fetch($sql, Closure $handler)
+	{
 		$sth = $this->query($sql);
 
 		while (($row = $sth->fetch(PDO::FETCH_ASSOC))) {
@@ -322,7 +342,8 @@ abstract class Connection {
 	 *
 	 * @return array array containing table names
 	 */
-	public function tables() {
+	public function tables()
+	{
 		$tables = [];
 		$sth = $this->query_for_tables();
 
@@ -336,7 +357,8 @@ abstract class Connection {
 	/**
 	 * Starts a transaction.
 	 */
-	public function transaction() {
+	public function transaction()
+	{
 		if (!$this->connection->beginTransaction()) {
 			throw new DatabaseException($this);
 		}
@@ -345,7 +367,8 @@ abstract class Connection {
 	/**
 	 * Commits the current transaction.
 	 */
-	public function commit() {
+	public function commit()
+	{
 		if (!$this->connection->commit()) {
 			throw new DatabaseException($this);
 		}
@@ -354,7 +377,8 @@ abstract class Connection {
 	/**
 	 * Rollback a transaction.
 	 */
-	public function rollback() {
+	public function rollback()
+	{
 		if (!$this->connection->rollback()) {
 			throw new DatabaseException($this);
 		}
@@ -365,7 +389,8 @@ abstract class Connection {
 	 *
 	 * @return bool
 	 */
-	public function supports_sequences() {
+	public function supports_sequences()
+	{
 		return false;
 	}
 
@@ -377,7 +402,8 @@ abstract class Connection {
 	 *
 	 * @return string sequence name or null if not supported
 	 */
-	public function get_sequence_name($table, $column_name) {
+	public function get_sequence_name($table, $column_name)
+	{
 		return "{$table}_seq";
 	}
 
@@ -388,7 +414,8 @@ abstract class Connection {
 	 *
 	 * @return string
 	 */
-	public function next_sequence_value($sequence_name) {
+	public function next_sequence_value($sequence_name)
+	{
 		return null;
 	}
 
@@ -399,7 +426,8 @@ abstract class Connection {
 	 *
 	 * @return string
 	 */
-	public function quote_name($string) {
+	public function quote_name($string)
+	{
 		return $string[0] === static::$QUOTE_CHARACTER || $string[strlen($string) - 1] === static::$QUOTE_CHARACTER ?
 			$string : static::$QUOTE_CHARACTER . $string . static::$QUOTE_CHARACTER;
 	}
@@ -411,7 +439,8 @@ abstract class Connection {
 	 *
 	 * @return string
 	 */
-	public function date_to_string($datetime) {
+	public function date_to_string($datetime)
+	{
 		return $datetime->format(static::$date_format);
 	}
 
@@ -422,7 +451,8 @@ abstract class Connection {
 	 *
 	 * @return string
 	 */
-	public function datetime_to_string($datetime) {
+	public function datetime_to_string($datetime)
+	{
 		return $datetime->format(static::$datetime_format);
 	}
 
@@ -431,9 +461,10 @@ abstract class Connection {
 	 *
 	 * @param string $string A datetime in the form accepted by date_create()
 	 *
-	 * @return DateTime
+	 * @return object The date_class set in Config
 	 */
-	public function string_to_datetime($string) {
+	public function string_to_datetime($string)
+	{
 		$date = date_create($string);
 		$errors = \DateTime::getLastErrors();
 
@@ -441,7 +472,13 @@ abstract class Connection {
 			return null;
 		}
 
-		return new DateTime($date->format(static::$datetime_format));
+		$date_class = Config::instance()->get_date_class();
+
+		return $date_class::createFromFormat(
+			static::DATETIME_TRANSLATE_FORMAT,
+			$date->format(static::DATETIME_TRANSLATE_FORMAT),
+			$date->getTimezone()
+		);
 	}
 
 	/**
@@ -490,7 +527,8 @@ abstract class Connection {
 	 *
 	 * @returns boolean (FALSE by default)
 	 */
-	public function accepts_limit_and_order_for_update_and_delete() {
+	public function accepts_limit_and_order_for_update_and_delete()
+	{
 		return false;
 	}
 
@@ -501,7 +539,8 @@ abstract class Connection {
 	 *
 	 * @return Connection
 	 */
-	protected function __construct($info) {
+	protected function __construct($info)
+	{
 		try {
 			// unix sockets start with a /
 			if ($info->host[0] != '/') {
@@ -527,7 +566,8 @@ abstract class Connection {
 	 *
 	 * @return string the full name of the class including namespace
 	 */
-	private static function load_adapter_class($adapter) {
+	private static function load_adapter_class($adapter)
+	{
 		$class = ucwords($adapter) . 'Adapter';
 		$fqclass = 'ActiveRecord\\' . $class;
 		$source = __DIR__ . "/adapters/$class.php";
@@ -539,4 +579,5 @@ abstract class Connection {
 		require_once $source;
 		return $fqclass;
 	}
+
 }

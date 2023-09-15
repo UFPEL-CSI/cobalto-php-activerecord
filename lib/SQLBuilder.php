@@ -211,10 +211,10 @@ class SQLBuilder
 	 * Converts a string like "id_and_name_or_z" into a conditions value like array("id=? AND name=? OR z=?", values, ...).
 	 *
 	 * @param Connection $connection
-	 * @param $name Underscored string
-	 * @param $values Array of values for the field names. This is used
-	 *   to determine what kind of bind marker to use: =?, IN(?), IS NULL
-	 * @param $map A hash of "mapped_column_name" => "real_column_name"
+	 * @param            $name       Underscored string
+	 * @param            $values     Array of values for the field names. This is used
+	 *                               to determine what kind of bind marker to use: =?, IN(?), IS NULL
+	 * @param            $map        A hash of "mapped_column_name" => "real_column_name"
 	 *
 	 * @return A conditions array in the form array(sql_string, value1, value2,...)
 	 */
@@ -256,8 +256,8 @@ class SQLBuilder
 	 * Like create_conditions_from_underscored_string but returns a hash of name => value array instead.
 	 *
 	 * @param string $name A string containing attribute names connected with _and_ or _or_
-	 * @param $args Array of values for each attribute in $name
-	 * @param $map A hash of "mapped_column_name" => "real_column_name"
+	 * @param        $args Array of values for each attribute in $name
+	 * @param        $map  A hash of "mapped_column_name" => "real_column_name"
 	 *
 	 * @return array A hash of array(name => value, ...)
 	 */
