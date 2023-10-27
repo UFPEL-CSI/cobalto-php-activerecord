@@ -6,7 +6,7 @@ namespace ActiveRecord;
 
 /**
  * Adapter for Postgres (not completed yet)
- * 
+ *
  * @package ActiveRecord
  */
 class PgsqlAdapter extends Connection
@@ -34,41 +34,85 @@ class PgsqlAdapter extends Connection
 		return $sql . ' LIMIT ' . intval($limit) . ' OFFSET ' . intval($offset);
 	}
 
-	public function query_column_info($table)
-	{
-		$full_table = explode(".", $table);
-		$table = (count($full_table) > 1 ? $full_table[1] : $full_table[0]);
-		$schema = (count($full_table) > 1 ? $full_table[0] : "public");
+    private function getDbVersion()
+    {
+        $sql = "SELECT replace(
+            replace(version(), 'PostgreSQL ', ''),
+            substring(replace(version(), 'PostgreSQL ', ''), position(' ' in  replace(version(), 'PostgreSQL ', '')))
+            , ''
+            ) as ver;";
 
-		$sql = <<<SQL
+        $sth = $this->query($sql);
+        $row = $sth->fetch(PDO::FETCH_NUM);
+        $version = $row[0];
+        $pos = strrpos($version, '.');
+        return intval(substr($version, 0, $pos));
+    }
+
+    public function query_column_info($table)
+    {
+        $full_table = explode(".", $table);
+        $table = (count($full_table) > 1 ? $full_table[1] : $full_table[0]);
+        $schema = (count($full_table) > 1 ? $full_table[0] : "public");
+
+        if ($this->getDbVersion() > 12) {
+            $sql = <<<SQL
 SELECT
-      a.attname AS field,
-      a.attlen,
-      REPLACE(pg_catalog.format_type(a.atttypid, a.atttypmod), 'character varying', 'varchar') AS type,
-      a.attnotnull AS not_nullable,
-      (SELECT 't'
+    a.attname AS field,
+    a.attlen,
+    REPLACE(pg_catalog.format_type(a.atttypid, a.atttypmod), 'character varying', 'varchar') AS type,
+    a.attnotnull AS not_nullable,
+    (SELECT 't'
         FROM pg_index
         WHERE c.oid = pg_index.indrelid
         AND a.attnum = ANY (pg_index.indkey)
         AND pg_index.indisprimary = 't'
-      ) IS NOT NULL AS pk,      
-      REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT pg_attrdef.adsrc
+    ) IS NOT NULL AS pk,
+    REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid)
         FROM pg_attrdef
         WHERE c.oid = pg_attrdef.adrelid
         AND pg_attrdef.adnum=a.attnum
-      ),'::[a-z_ ]+',''),'''$',''),'^''','') AS default
+    ),'::[a-z_ ]+',''),'''$',''),'^''','') AS default
 FROM pg_attribute as a
 join pg_class as c on a.attrelid = c.oid
 join pg_type t on a.atttypid = t.oid
 join pg_namespace as e on c.relnamespace = e.oid
 WHERE c.relname = ?
-  and e.nspname = ?
-  AND a.attnum > 0
+and e.nspname = ?
+AND a.attnum > 0
 ORDER BY a.attnum
 SQL;
-		$values = array($table, $schema);
-		return $this->query($sql,$values);
-	}
+        } else {
+            $sql = <<<SQL
+SELECT
+    a.attname AS field,
+    a.attlen,
+    REPLACE(pg_catalog.format_type(a.atttypid, a.atttypmod), 'character varying', 'varchar') AS type,
+    a.attnotnull AS not_nullable,
+    (SELECT 't'
+        FROM pg_index
+        WHERE c.oid = pg_index.indrelid
+        AND a.attnum = ANY (pg_index.indkey)
+        AND pg_index.indisprimary = 't'
+    ) IS NOT NULL AS pk,
+    REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE((SELECT pg_attrdef.adsrc
+        FROM pg_attrdef
+        WHERE c.oid = pg_attrdef.adrelid
+        AND pg_attrdef.adnum=a.attnum
+    ),'::[a-z_ ]+',''),'''$',''),'^''','') AS default
+FROM pg_attribute as a
+join pg_class as c on a.attrelid = c.oid
+join pg_type t on a.atttypid = t.oid
+join pg_namespace as e on c.relnamespace = e.oid
+WHERE c.relname = ?
+and e.nspname = ?
+AND a.attnum > 0
+ORDER BY a.attnum
+SQL;
+        }
+        $values = array($table, $schema);
+        return $this->query($sql, $values);
+    }
 
 	public function query_for_tables()
 	{
