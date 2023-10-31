@@ -1,5 +1,5 @@
 web:
-  image: php:5.6.40-fpm-alpine
+  image: ufpel/cobalto-web:so_debian-10-buster_php-7.1.33_img-v1.0.0 
   ports:
     - "80:80"
   links:
@@ -14,13 +14,13 @@ web:
   entrypoint: sh /var/www/html/docker/init.sh 
 
 dbpostgres:
-  image: postgres:9.5-alpine
+  image: ufpel/cobalto-postgres:so_ubuntu-alpine_app-9.5_img-v1.0.0
   ports:
     - "5432:5432"
   environment:
-    POSTGRES_DB: phpar_test
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: password
+      POSTGRES_DB: cobalto-desenv
+      POSTGRES_USER: cobalto-desenv
+      POSTGRES_PASSWORD: cobalto-desenv
 
 dbmysql:
   image: mysql:5.7.30

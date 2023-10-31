@@ -1,7 +1,7 @@
 <?php
 
-if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300) {
-	die('PHP ActiveRecord requires PHP 5.3 or higher');
+if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 70300) {
+	die('PHP ActiveRecord requires PHP 7.0.33 or higher');
 }
 
 define('PHP_ACTIVERECORD_VERSION_ID', '1.0');
