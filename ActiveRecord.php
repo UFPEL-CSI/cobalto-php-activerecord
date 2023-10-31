@@ -1,7 +1,7 @@
 <?php
 
-if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 70300) {
-	die('PHP ActiveRecord requires PHP 7.0.33 or higher');
+if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300) {
+	die('PHP ActiveRecord requires PHP 5.3 or higher');
 }
 
 define('PHP_ACTIVERECORD_VERSION_ID', '1.0');
@@ -29,7 +29,8 @@ if (!defined('PHP_ACTIVERECORD_AUTOLOAD_DISABLE')) {
 	spl_autoload_register('activerecord_autoload', PHP_ACTIVERECORD_AUTOLOAD_PREPEND);
 }
 
-function activerecord_autoload($class_name) {
+function activerecord_autoload($class_name)
+{
 	$path = ActiveRecord\Config::instance()->get_model_directory();
 	$root = realpath(isset($path) ? $path : '.');
 
