@@ -1,18 +1,16 @@
 <?php
-/**
- * @package ActiveRecord
- */
+
 namespace ActiveRecord;
 
+use PDO;
+
 /**
- * Adapter for Postgres (not completed yet)
- *
- * @package ActiveRecord
+ * Adapter for Postgres (not completed yet).
  */
 class PgsqlAdapter extends Connection
 {
-	static $QUOTE_CHARACTER = '"';
-	static $DEFAULT_PORT = 5432;
+	public static $QUOTE_CHARACTER = '"';
+	public static $DEFAULT_PORT = 5432;
 
 	public function supports_sequences()
 	{
@@ -26,7 +24,7 @@ class PgsqlAdapter extends Connection
 
 	public function next_sequence_value($sequence_name)
 	{
-		return "nextval('" . str_replace("'","\\'",$sequence_name) . "')";
+		return "nextval('" . str_replace("'", "\\'", $sequence_name) . "')";
 	}
 
 	public function limit($sql, $offset, $limit)
@@ -34,29 +32,14 @@ class PgsqlAdapter extends Connection
 		return $sql . ' LIMIT ' . intval($limit) . ' OFFSET ' . intval($offset);
 	}
 
-    private function getDbVersion()
-    {
-        $sql = "SELECT replace(
-            replace(version(), 'PostgreSQL ', ''),
-            substring(replace(version(), 'PostgreSQL ', ''), position(' ' in  replace(version(), 'PostgreSQL ', '')))
-            , ''
-            ) as ver;";
+	public function query_column_info($table)
+	{
+		$full_table = explode('.', $table);
+		$table = (count($full_table) > 1 ? $full_table[1] : $full_table[0]);
+		$schema = (count($full_table) > 1 ? $full_table[0] : 'public');
 
-        $sth = $this->query($sql);
-        $row = $sth->fetch(PDO::FETCH_NUM);
-        $version = $row[0];
-        $pos = strrpos($version, '.');
-        return intval(substr($version, 0, $pos));
-    }
-
-    public function query_column_info($table)
-    {
-        $full_table = explode(".", $table);
-        $table = (count($full_table) > 1 ? $full_table[1] : $full_table[0]);
-        $schema = (count($full_table) > 1 ? $full_table[0] : "public");
-
-        if ($this->getDbVersion() > 12) {
-            $sql = <<<SQL
+		if ($this->getDbVersion() > 12) {
+			$sql = <<<SQL
 SELECT
     a.attname AS field,
     a.attlen,
@@ -82,8 +65,8 @@ and e.nspname = ?
 AND a.attnum > 0
 ORDER BY a.attnum
 SQL;
-        } else {
-            $sql = <<<SQL
+		} else {
+			$sql = <<<SQL
 SELECT
     a.attname AS field,
     a.attlen,
@@ -109,10 +92,10 @@ and e.nspname = ?
 AND a.attnum > 0
 ORDER BY a.attnum
 SQL;
-        }
-        $values = array($table, $schema);
-        return $this->query($sql, $values);
-    }
+		}
+		$values = [$table, $schema];
+		return $this->query($sql, $values);
+	}
 
 	public function query_for_tables()
 	{
@@ -128,37 +111,33 @@ SQL;
 		$c->pk				= ($column['pk'] ? true : false);
 		$c->auto_increment	= false;
 
-		if (substr($column['type'],0,9) == 'timestamp')
-		{
+		if (substr($column['type'], 0, 9) == 'timestamp') {
 			$c->raw_type = 'datetime';
 			$c->length = 19;
-		}
-		elseif ($column['type'] == 'date')
-		{
+		} elseif ($column['type'] == 'date') {
 			$c->raw_type = 'date';
 			$c->length = 10;
-		}
-		else
-		{
-			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/',$column['type'],$matches);
+		} else {
+			preg_match('/^([A-Za-z0-9_]+)(\(([0-9]+(,[0-9]+)?)\))?/', $column['type'], $matches);
 
 			$c->raw_type = (count($matches) > 0 ? $matches[1] : $column['type']);
 			$c->length = count($matches) >= 4 ? intval($matches[3]) : intval($column['attlen']);
 
-			if ($c->length < 0)
+			if ($c->length < 0) {
 				$c->length = null;
+			}
 		}
 
 		$c->map_raw_type();
 
-		if ($column['default'])
-		{
-			preg_match("/^nextval\('(.*)'\)$/",$column['default'],$matches);
+		if ($column['default']) {
+			preg_match("/^nextval\('(.*)'\)$/", $column['default'], $matches);
 
-			if (count($matches) == 2)
+			if (count($matches) == 2) {
 				$c->sequence = $matches[1];
-			else
-				$c->default = $c->cast($column['default'],$this);
+			} else {
+				$c->default = $c->cast($column['default'], $this);
+			}
 		}
 		return $c;
 	}
@@ -170,20 +149,34 @@ SQL;
 
 	public function native_database_types()
 	{
-		return array(
+		return [
 			'primary_key' => 'serial primary key',
-			'string' => array('name' => 'character varying', 'length' => 255),
-			'text' => array('name' => 'text'),
-			'integer' => array('name' => 'integer'),
-			'float' => array('name' => 'float'),
-			'datetime' => array('name' => 'datetime'),
-			'timestamp' => array('name' => 'timestamp'),
-			'time' => array('name' => 'time'),
-			'date' => array('name' => 'date'),
-			'binary' => array('name' => 'binary'),
-			'boolean' => array('name' => 'boolean')
-		);
+			'string' => ['name' => 'character varying', 'length' => 255],
+			'text' => ['name' => 'text'],
+			'integer' => ['name' => 'integer'],
+			'float' => ['name' => 'float'],
+			'datetime' => ['name' => 'datetime'],
+			'timestamp' => ['name' => 'timestamp'],
+			'time' => ['name' => 'time'],
+			'date' => ['name' => 'date'],
+			'binary' => ['name' => 'binary'],
+			'boolean' => ['name' => 'boolean'],
+		];
+	}
+
+	private function getDbVersion()
+	{
+		$sql = "SELECT replace(
+            replace(version(), 'PostgreSQL ', ''),
+            substring(replace(version(), 'PostgreSQL ', ''), position(' ' in  replace(version(), 'PostgreSQL ', '')))
+            , ''
+            ) as ver;";
+
+		$sth = $this->query($sql);
+		$row = $sth->fetch(PDO::FETCH_NUM);
+		$version = $row[0];
+		$pos = strrpos($version, '.');
+		return intval(substr($version, 0, $pos));
 	}
 
 }
-?>
