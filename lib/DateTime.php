@@ -31,7 +31,7 @@ require_once 'DateTimeInterface.php';
  *
  * @see http://php.net/manual/en/class.datetime.php
  */
-class DateTime extends \DateTime implements DateTimeInterface
+class DateTime extends \DateTime
 {
 	/**
 	 * Default format used for format() and __toString().
@@ -57,7 +57,7 @@ class DateTime extends \DateTime implements DateTimeInterface
 		'rfc2822' => \DateTime::RFC2822,
 		'rfc3339' => \DateTime::RFC3339,
 		'rss'     => \DateTime::RSS,
-		'w3c'     => \DateTime::W3C];
+		'w3c'     => \DateTime::W3C, ];
 
 	private $model;
 	private $attribute_name;
@@ -204,5 +204,4 @@ class DateTime extends \DateTime implements DateTimeInterface
 			$this->model->flag_dirty($this->attribute_name);
 		}
 	}
-
 }
