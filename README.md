@@ -92,7 +92,7 @@ vendor/bin/phpunit -c phpunit.xml test/
 
 ### Retrieve ###
 Estes são seus métodos básicos para encontrar e recuperar registros de seu banco de dados.
-Veja a seção *Finders* para mais detalhes.
+Veja a seção [*Finders*](https://www.phpactiverecord.org/projects/main/wiki/Finders) para mais detalhes.
 
 ```php
 $post = Post::find(1);
