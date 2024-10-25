@@ -1,28 +1,15 @@
 #!/bin/bash
-apk --update add openssh-client make grep autoconf gcc libc-dev zlib-dev;
-apk add memcached
-apk add php5-mysql;
-apk add php5-pdo_mysql
-apk add php5-mysqli;
-apk add php5-pgsql;
-apk add php5-pdo_pgsql
-apk add composer;
-# cd /tmp \
-#     && curl -o php-memcache.tgz http://pecl.php.net/get/memcache-3.0.8.tgz \
-#     && tar -xzvf php-memcache.tgz \
-#     && cd memcache-3.0.8 \
-#     && curl -o memcache-faulty-inline.patch http://git.alpinelinux.org/cgit/aports/plain/main/php5-memcache/memcache-faulty-inline.patch?h=3.4-stable \
-#     && patch -p1 -i memcache-faulty-inline.patch \
-#     && phpize \
-#     && ./configure --prefix=/usr \
-#     && make INSTALL_ROOT=/ install \
-#     && install -d ./etc/php/conf.d; # \
-    #&& echo "extension=memcache.so" > /usr/local/etc/php/conf.d/docker-php-ext-memcache.ini;
-    #  \
-    # && echo "extension=php_pdo_pgsql.dll" > /usr/local/etc/php/conf.d/docker-php-ext-pdo_pgsql.ini \
-    # && echo "extension=php_pgsql.dll" > /usr/local/etc/php/conf.d/docker-php-ext-pgsql.ini \
-    # && echo "extension=php_pdo_mysql.dll" > /usr/local/etc/php/conf.d/docker-php-ext-pdo_mysql.ini \
-    # && echo "extension=php_mysqli.dll" > /usr/local/etc/php/conf.d/docker-php-ext-pdo_mysql.ini;
-composer update;
-CFLAGS="-fgnu89-inline" pecl install memcache-3.0.7;
-php-fpm;
+#apt-get install openssh-client make grep autoconf gcc libc-dev zlib-dev;
+# apt-get install memcached
+apt-get update
+apt-get install unzip libpq-dev -y
+ docker-php-ext-install pdo pdo_mysql pdo_pgsql 
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+mv composer.phar /usr/local/bin/composer
+
+rm -rf vendor/ && rm composer.lock
+composer install
+exec apache2ctl -D FOREGROUND

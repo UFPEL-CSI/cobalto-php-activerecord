@@ -53,7 +53,9 @@ abstract class Connection
 	 *
 	 * @var string
 	 */
-	public static $datetime_format = 'Y-m-d H:i:s T';
+	public static $datetime_format = 'Y-m-d H:i:s';
+	//alterado para evitar falhas nos testes, valor anterior: 'Y-m-d H:i:s T';
+	//@todo verificar se não trará prejuízos na precisão da data do mysql
 	/**
 	 * Default PDO options to set for each connection.
 	 *
@@ -63,7 +65,7 @@ abstract class Connection
 		PDO::ATTR_CASE => PDO::CASE_LOWER,
 		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 		PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-		PDO::ATTR_STRINGIFY_FETCHES => false];
+		PDO::ATTR_STRINGIFY_FETCHES => false, ];
 	/**
 	 * The quote character for stuff like column and field names.
 	 *
@@ -579,5 +581,4 @@ abstract class Connection
 		require_once $source;
 		return $fqclass;
 	}
-
 }

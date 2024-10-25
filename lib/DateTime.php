@@ -2,7 +2,6 @@
 
 namespace ActiveRecord;
 
-require_once 'DateTimeInterface.php';
 /**
  * An extension of PHP's DateTime class to provide dirty flagging and easier formatting options.
  *

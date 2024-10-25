@@ -19,7 +19,7 @@ use Webmozart\Assert\Assert;
 /**
  * Reflection class for a {@}example tag in a Docblock.
  */
-final class Example extends BaseTag
+final class Example extends BaseTag implements Factory\StaticMethod
 {
     /**
      * @var string Path to a file to use as an example. May also be an absolute URI.
@@ -33,12 +33,12 @@ final class Example extends BaseTag
     private $isURI = false;
 
     /**
-     * @var
+     * @var int
      */
     private $startingLine;
 
     /**
-     * @var
+     * @var int
      */
     private $lineCount;
 

@@ -1,3 +1,4 @@
+
 CREATE TABLE authors(
 	author_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	parent_author_id INT,

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of sebastian/diff.
  *
@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  * @uses SebastianBergmann\Diff\Diff
  * @uses SebastianBergmann\Diff\Line
  */
-class ParserTest extends TestCase
+final class ParserTest extends TestCase
 {
     /**
      * @var Parser
@@ -38,16 +38,16 @@ class ParserTest extends TestCase
         $diffs = $this->parser->parse($content);
 
         $this->assertInternalType('array', $diffs);
-        $this->assertContainsOnlyInstancesOf('SebastianBergmann\Diff\Diff', $diffs);
+        $this->assertContainsOnlyInstancesOf(Diff::class, $diffs);
         $this->assertCount(1, $diffs);
 
         $chunks = $diffs[0]->getChunks();
         $this->assertInternalType('array', $chunks);
-        $this->assertContainsOnlyInstancesOf('SebastianBergmann\Diff\Chunk', $chunks);
+        $this->assertContainsOnlyInstancesOf(Chunk::class, $chunks);
 
         $this->assertCount(1, $chunks);
 
-        $this->assertEquals(20, $chunks[0]->getStart());
+        $this->assertSame(20, $chunks[0]->getStart());
 
         $this->assertCount(4, $chunks[0]->getLines());
     }
@@ -63,9 +63,9 @@ class ParserTest extends TestCase
         $chunks = $diffs[0]->getChunks();
         $this->assertCount(3, $chunks);
 
-        $this->assertEquals(20, $chunks[0]->getStart());
-        $this->assertEquals(320, $chunks[1]->getStart());
-        $this->assertEquals(600, $chunks[2]->getStart());
+        $this->assertSame(20, $chunks[0]->getStart());
+        $this->assertSame(320, $chunks[1]->getStart());
+        $this->assertSame(600, $chunks[2]->getStart());
 
         $this->assertCount(5, $chunks[0]->getLines());
         $this->assertCount(5, $chunks[1]->getLines());
@@ -80,18 +80,18 @@ index abcdefg..abcdefh 100644
 --- a/Test.txt
 +++ b/Test.txt
 @@ -49,9 +49,8 @@
-A
+ A
 -B
 A;
         $diffs = $this->parser->parse($content);
         $this->assertInternalType('array', $diffs);
-        $this->assertContainsOnlyInstancesOf('SebastianBergmann\Diff\Diff', $diffs);
+        $this->assertContainsOnlyInstancesOf(Diff::class, $diffs);
         $this->assertCount(1, $diffs);
 
         $chunks = $diffs[0]->getChunks();
 
         $this->assertInternalType('array', $chunks);
-        $this->assertContainsOnlyInstancesOf('SebastianBergmann\Diff\Chunk', $chunks);
+        $this->assertContainsOnlyInstancesOf(Chunk::class, $chunks);
         $this->assertCount(1, $chunks);
 
         $chunk = $chunks[0];
@@ -102,7 +102,7 @@ A;
 
         $lines = $chunk->getLines();
         $this->assertInternalType('array', $lines);
-        $this->assertContainsOnlyInstancesOf('SebastianBergmann\Diff\Line', $lines);
+        $this->assertContainsOnlyInstancesOf(Line::class, $lines);
         $this->assertCount(2, $lines);
 
         /** @var Line $line */
@@ -123,7 +123,7 @@ index abcdefg..abcdefh 100644
 --- a/Test.txt
 +++ b/Test.txt
 @@ -1,3 +1,2 @@
-A
+ A
 -B
 
 diff --git a/Test123.txt b/Test123.txt
@@ -131,7 +131,7 @@ index abcdefg..abcdefh 100644
 --- a/Test2.txt
 +++ b/Test2.txt
 @@ -1,2 +1,3 @@
-A
+ A
 +B
 A;
         $diffs = $this->parser->parse($content);

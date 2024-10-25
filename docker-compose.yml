@@ -1,5 +1,5 @@
-web:
-  image: ufpel/cobalto-web:so_debian-10-buster_php-7.1.33_img-v1.0.0 
+web-record:
+  image: php:7.1.33-apache-buster
   ports:
     - "80:80"
   links:
@@ -7,29 +7,38 @@ web:
     - dbmysql
   volumes:
     - .:/var/www/html
-    - ./docker/:/usr/local/etc/php
+
   environment:
-    PHPAR_MYSQL: mysql://root:password@dbmysql/phpar_test
-    PHPAR_PGSQL: pgsql://postgres:password@dbpostgres/phpar_test
+    PHPAR_MYSQL: mysql://root:pass@dbmysql/dbname
+    PHPAR_PGSQL: pgsql://user:pass@dbpostgres/dbname
   entrypoint: sh /var/www/html/docker/init.sh 
 
 dbpostgres:
   image: ufpel/cobalto-postgres:so_ubuntu-alpine_app-9.5_img-v1.0.0
+  volumes:
+    - .:/var/www/html
+    - ./test/sql/pgsql.sql:/docker-entrypoint-initdb.d/pgsql.sql:rw
   ports:
     - "5432:5432"
   environment:
-      POSTGRES_DB: cobalto-desenv
-      POSTGRES_USER: cobalto-desenv
-      POSTGRES_PASSWORD: cobalto-desenv
+      POSTGRES_DB: dbname
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      #BASH_SOURCE: /var/www/html/docker/pginit.sh 
+      #psql -Uuser -W -d dbname -f /var/www/html/test/sql/pgsql.sql
 
 dbmysql:
   image: mysql:5.7.30
+  volumes:
+    - .:/var/www/html
+    - ./test/sql/mysql.sql:/docker-entrypoint-initdb.d/mysql.sql:rw
   ports:
     - "3306:3306"
   environment:
-    MYSQL_DATABASE: phpar_test
-    #    MYSQL_USER: root
-    #    MYSQL_PASSWORD: password
-    MYSQL_ROOT_PASSWORD: password
+    MYSQL_DATABASE: dbname
+    MYSQL_PASSWORD: pass
+    MYSQL_ROOT_PASSWORD: pass
+  
+    #no terminal executar: mysql -u root -ppass -D dbname < /var/www/html/test/sql/mysql.sql
 
 #MYSQL_ROOT_PASSWORD, MYSQL_ALLOW_EMPTY_PASSWORD and MYSQL_RANDOM_ROOT_PASSWORD

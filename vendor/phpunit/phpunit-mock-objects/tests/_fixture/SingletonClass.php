@@ -2,27 +2,27 @@
 
 class SingletonClass
 {
-	public static function getInstance()
-	{
-	}
+    public static function getInstance()
+    {
+    }
 
-	public function doSomething()
-	{
-	}
+    public function doSomething()
+    {
+    }
 
-	final public function __sleep()
-	{
-	}
+    protected function __construct()
+    {
+    }
 
-	protected function __construct()
-	{
-	}
+    final private function __sleep()
+    {
+    }
 
-	final private function __wakeup()
-	{
-	}
+    final private function __wakeup()
+    {
+    }
 
-	final private function __clone()
-	{
-	}
+    final private function __clone()
+    {
+    }
 }

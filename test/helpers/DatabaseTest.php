@@ -1,10 +1,12 @@
 <?php
+
 require_once __DIR__ . '/DatabaseLoader.php';
+require_once __DIR__ . '/SnakeCase_PHPUnit_Framework_TestCase.php';
 
 class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 {
-	protected $conn;
 	public static $log = false;
+	protected $conn;
 
 	public function set_up($connection_name=null)
 	{
@@ -13,13 +15,13 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$config = ActiveRecord\Config::instance();
 		$this->original_default_connection = $config->get_default_connection();
 
-		if ($connection_name)
+		if ($connection_name) {
 			$config->set_default_connection($connection_name);
+		}
 
-		if ($connection_name == 'sqlite' || $config->get_default_connection() == 'sqlite')
-		{
+		if ($connection_name == 'sqlite' || $config->get_default_connection() == 'sqlite') {
 			// need to create the db. the adapter specifically does not create it for us.
-			$this->db = substr(ActiveRecord\Config::instance()->get_connection('sqlite'),9);
+			$this->db = substr(ActiveRecord\Config::instance()->get_connection('sqlite'), 9);
 			new SQLite3($this->db);
 		}
 
@@ -27,7 +29,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 		try {
 			$this->conn = ActiveRecord\ConnectionManager::get_connection($connection_name);
 		} catch (ActiveRecord\DatabaseException $e) {
-			$this->mark_test_skipped($connection_name . ' failed to connect. '.$e->getMessage());
+			$this->mark_test_skipped($connection_name . ' failed to connect. ' . $e->getMessage());
 		}
 
 		$GLOBALS['ACTIVERECORD_LOG'] = false;
@@ -35,19 +37,21 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$loader = new DatabaseLoader($this->conn);
 		$loader->reset_table_data();
 
-		if (self::$log)
+		if (self::$log) {
 			$GLOBALS['ACTIVERECORD_LOG'] = true;
+		}
 	}
 
 	public function tear_down()
 	{
-		if ($this->original_default_connection)
+		if ($this->original_default_connection) {
 			ActiveRecord\Config::instance()->set_default_connection($this->original_default_connection);
+		}
 	}
 
 	public function assert_exception_message_contains($contains, $closure)
 	{
-		$message = "";
+		$message = '';
 
 		try {
 			$closure();
@@ -55,7 +59,7 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 			$message = $e->getMessage();
 		}
 
-		$this->assert_true(strpos($message,$contains) !== false);
+		$this->assert_true(strpos($message, $contains) !== false);
 	}
 
 	/**
@@ -66,16 +70,15 @@ class DatabaseTest extends SnakeCase_PHPUnit_Framework_TestCase
 	 */
 	public function assert_sql_has($needle, $haystack)
 	{
-		$needle = str_replace(array('"','`'),'',$needle);
-		$haystack = str_replace(array('"','`'),'',$haystack);
-		return $this->assert_true(strpos($haystack,$needle) !== false);
+		$needle = str_replace(['"', '`'], '', $needle);
+		$haystack = str_replace(['"', '`'], '', $haystack);
+		return $this->assert_true(strpos($haystack, $needle) !== false);
 	}
 
 	public function assert_sql_doesnt_has($needle, $haystack)
 	{
-		$needle = str_replace(array('"','`'),'',$needle);
-		$haystack = str_replace(array('"','`'),'',$haystack);
-		return $this->assert_false(strpos($haystack,$needle) !== false);
+		$needle = str_replace(['"', '`'], '', $needle);
+		$haystack = str_replace(['"', '`'], '', $haystack);
+		return $this->assert_false(strpos($haystack, $needle) !== false);
 	}
 }
-?>
