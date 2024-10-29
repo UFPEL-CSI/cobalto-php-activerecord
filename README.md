@@ -1,4 +1,4 @@
-# Cobalto ActiveRecord - Version 2.0.11-rc #
+# Cobalto ActiveRecord - Version 2.1.0 #
 
 ## Introdução ##
 
@@ -18,7 +18,7 @@ Claro, existem algumas diferenças que serão óbvias para o usuário se ele est
 
 ### Minimum Requirements ###
 
-- PHP = 7.0.0
+- PHP >= 7.0.0 and <= 7.4 
 * Driver PDO para seu respectivo banco de dados com personalizações feitas pela equipe de desenvolvimento da ufpel
 
 ### Supported Databases ###
@@ -84,8 +84,9 @@ armazene-o em cache para que não faça várias chamadas ao banco de dados para 
 
 ## Testes ##
 ```php
-composer update
-vendor/bin/phpunit -c phpunit.xml test/
+docker-compose up
+
+docker-compose exec web-record vendor/bin/phpunit -c phpunit.xml test/
 ```
 
 ## Exemplos ##

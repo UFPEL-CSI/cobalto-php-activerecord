@@ -14,3 +14,7 @@ correções de erro de data no suporte ao php 7.0.0
 Version 2.0.6 
 
 Ajuste no adptador pgsql para dar suporte ao postgres 15.3
+
+Version 2.1.0
+
+Adicionado suporte ao php 7.4
