@@ -482,11 +482,6 @@ class Model
 					$value->getTimezone()
 				);
 			}
-		}
-
-		if ($value instanceof DateTimeInterface) {
-			// Tell the Date object that it's associated with this model and attribute. This is so it
-			// has the ability to flag this model as dirty if a field in the Date object changes.
 			$value->attribute_of($this, $name);
 		}
 
@@ -910,7 +905,6 @@ class Model
 		$values = $sql->bind_values();
 		$ret = $conn->query(($table->last_sql = $sql->to_s()), $values);
 		return $ret->rowCount();
-
 	}
 
 	/**
@@ -1440,13 +1434,13 @@ class Model
 	 */
 	public static function find_by_pk($values, $options)
 	{
-		if($values===null) {
+		if ($values===null) {
 			throw new RecordNotFound("Couldn't find " . get_called_class() . ' without an ID');
 		}
 
 		$table = static::table();
 
-		if($table->cache_individual_model) {
+		if ($table->cache_individual_model) {
 			$list = static::get_models_from_cache($values, $options);
 		} else {
 			$options['conditions'] = static::pk_conditions($values);
@@ -1701,7 +1695,7 @@ class Model
 	protected function expire_cache()
 	{
 		$table = static::table();
-		if($table->cache_individual_model) {
+		if ($table->cache_individual_model) {
 			Cache::delete($this->cache_key());
 		}
 	}
@@ -1724,11 +1718,11 @@ class Model
 		$models = [];
 		$table = static::table();
 
-		if(!is_array($pks)) {
+		if (!is_array($pks)) {
 			$pks = [$pks];
 		}
 
-		foreach($pks as $pk) {
+		foreach ($pks as $pk) {
 			$options['conditions'] = static::pk_conditions($pk);
 			$models[] = Cache::get($table->cache_key_for_model($pk), function () use ($table, $options) {
 				$res = $table->find($options);

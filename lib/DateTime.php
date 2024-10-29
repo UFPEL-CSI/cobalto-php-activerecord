@@ -1,4 +1,7 @@
 <?php
+/**
+ * @phpstan-consistent-constructor
+ */
 
 namespace ActiveRecord;
 
@@ -30,7 +33,7 @@ namespace ActiveRecord;
  *
  * @see http://php.net/manual/en/class.datetime.php
  */
-class DateTime extends \DateTime
+final class DateTime extends \DateTime
 {
 	/**
 	 * Default format used for format() and __toString().
@@ -39,6 +42,8 @@ class DateTime extends \DateTime
 
 	/**
 	 * Pre-defined format strings.
+	 *
+	 * @var array<string, string>
 	 */
 	public static $FORMATS = [
 		'db'      => 'Y-m-d H:i:s',
@@ -152,18 +157,21 @@ class DateTime extends \DateTime
 	public function setDate($year, $month, $day)
 	{
 		$this->flag_dirty();
+
 		return parent::setDate($year, $month, $day);
 	}
 
 	public function setISODate($year, $week, $day = 1)
 	{
 		$this->flag_dirty();
+
 		return parent::setISODate($year, $week, $day);
 	}
 
 	public function setTime($hour, $minute, $second = 0, $microseconds = 0)
 	{
 		$this->flag_dirty();
+
 		return parent::setTime($hour, $minute, $second);
 	}
 
@@ -176,24 +184,28 @@ class DateTime extends \DateTime
 	public function setTimezone($timezone)
 	{
 		$this->flag_dirty();
+
 		return parent::setTimezone($timezone);
 	}
 
 	public function modify($modify)
 	{
 		$this->flag_dirty();
+
 		return parent::modify($modify);
 	}
 
 	public function add($interval)
 	{
 		$this->flag_dirty();
+
 		return parent::add($interval);
 	}
 
 	public function sub($interval)
 	{
 		$this->flag_dirty();
+
 		return parent::sub($interval);
 	}
 
