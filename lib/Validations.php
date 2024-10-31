@@ -755,6 +755,9 @@ class Errors implements IteratorAggregate
 	public function on($attribute)
 	{
 		$errors = $this->$attribute;
+		if (!is_array($errors)) {
+			$errors = [$errors];
+		}
 
 		return $errors && count($errors) == 1 ? $errors[0] : $errors;
 	}
@@ -890,6 +893,9 @@ class Errors implements IteratorAggregate
 		$count = 0;
 
 		foreach ($this->errors as $attribute => $error) {
+			if (!is_array($error)) {
+				$error = [$error];
+			}
 			$count += count($error);
 		}
 

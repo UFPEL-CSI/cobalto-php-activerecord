@@ -18,3 +18,14 @@ Ajuste no adptador pgsql para dar suporte ao postgres 15.3
 Version 2.1.0
 
 Adicionado suporte ao php 7.4
+
+Version 2.1.2
+
+Corrigido warning no uso do count em:
+ - lib/Expressions.php
+ - lib/Model.php
+ - lib/SQLBuilder.php
+ - lib/Table.php
+ - lib/Utils.php
+ - lib/Validations.php
+ - lib/adapters/PgsqlAdapter.php

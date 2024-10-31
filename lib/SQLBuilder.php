@@ -223,6 +223,9 @@ class SQLBuilder
 		if (!$name) {
 			return null;
 		}
+		if (!is_array($values)) {
+			$values = [$values];
+		}
 
 		$parts = preg_split('/(_and_|_or_)/i', $name, -1, PREG_SPLIT_DELIM_CAPTURE);
 		$num_values = count($values);
@@ -298,6 +301,9 @@ class SQLBuilder
 	private function apply_where_conditions($args)
 	{
 		require_once 'Expressions.php';
+		if (!is_array($args)) {
+			$args = [$args];
+		}
 		$num_args = count($args);
 
 		if ($num_args == 1 && is_hash($args[0])) {

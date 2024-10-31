@@ -90,6 +90,9 @@ class Expressions
 		}
 
 		$values = array_key_exists('values', $options) ? $options['values'] : $this->values;
+		if (!is_array($values)) {
+			$values = [$values];
+		}
 
 		$ret = '';
 		$replace = [];

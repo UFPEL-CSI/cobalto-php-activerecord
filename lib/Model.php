@@ -1448,11 +1448,13 @@ class Model
 		}
 		$results = count($list);
 
-		if ($results != ($expected = count($values))) {
+		$expected = 1;
+		if (is_array($values)) {
+			$expected = count($values);
+			$values = join(',', $values);
+		}
+		if ($results != ($expected)) {
 			$class = get_called_class();
-			if (is_array($values)) {
-				$values = join(',', $values);
-			}
 
 			if ($expected == 1) {
 				throw new RecordNotFound("Couldn't find $class with ID=$values");

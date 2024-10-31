@@ -1,4 +1,4 @@
-# Cobalto ActiveRecord - Version 2.1.0 #
+# Cobalto ActiveRecord - Version 2.1.2 #
 
 ## Introdução ##
 
