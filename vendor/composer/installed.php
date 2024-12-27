@@ -20,12 +20,12 @@
             'dev_requirement' => false,
         ),
         'myclabs/deep-copy' => array(
-            'pretty_version' => '1.12.0',
-            'version' => '1.12.0.0',
+            'pretty_version' => '1.12.1',
+            'version' => '1.12.1.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../myclabs/deep-copy',
             'aliases' => array(),
-            'reference' => '3a6b9a42cd8f8771bd4295d13e1423fa7f3d942c',
+            'reference' => '123267b2c49fbf30d78a7b2d333f6be754b94845',
             'dev_requirement' => false,
         ),
         'phar-io/manifest' => array(
