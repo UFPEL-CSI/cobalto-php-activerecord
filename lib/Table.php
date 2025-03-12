@@ -290,7 +290,7 @@ class Table
 			$table = $this->conn->quote_name($this->db_name) . ".$table";
 		}
 
-		return $table;
+		return trim($table);
 	}
 
 	/**
@@ -474,10 +474,10 @@ class Table
 	private function set_table_name()
 	{
 		if (($table = $this->class->getStaticPropertyValue('table', null)) || ($table = $this->class->getStaticPropertyValue('table_name', null))) {
-			$this->table = $table;
+			$this->table = trim($table);
 		} else {
 			// infer table name from the class name
-			$this->table = Inflector::instance()->tableize($this->class->getName());
+			$this->table = trim(Inflector::instance()->tableize($this->class->getName()));
 
 			// strip namespaces from the table name if any
 			$parts = explode('\\', $this->table);

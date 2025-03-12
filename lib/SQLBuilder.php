@@ -44,7 +44,7 @@ class SQLBuilder
 		}
 
 		$this->connection	= $connection;
-		$this->table		= $table;
+		$this->table		= trim($table);
 	}
 
 	/**
@@ -213,7 +213,7 @@ class SQLBuilder
 	 * @param Connection $connection
 	 * @param            $name       Underscored string
 	 * @param            $values     Array of values for the field names. This is used
-	 *                               to determine what kind of bind marker to use: =?, IN(?), IS NULL
+	 *                              to determine what kind of bind marker to use: =?, IN(?), IS NULL
 	 * @param            $map        A hash of "mapped_column_name" => "real_column_name"
 	 *
 	 * @return A conditions array in the form array(sql_string, value1, value2,...)
@@ -288,7 +288,7 @@ class SQLBuilder
 	private function prepend_table_name_to_fields($hash=[])
 	{
 		$new = [];
-		$table = $this->connection->quote_name($this->table);
+		$table = $this->connection->quote_name(trim($this->table));
 
 		foreach ($hash as $key => $value) {
 			$k = $this->connection->quote_name($key);
