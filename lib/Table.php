@@ -115,7 +115,7 @@ class Table
 			return $joins;
 		}
 
-		$self = $this->table;
+		$self = trim($this->table);
 		$ret = $space = '';
 
 		$existing_tables = [];
@@ -284,7 +284,7 @@ class Table
 	 */
 	public function get_fully_qualified_table_name($quote_name=false)
 	{
-		$table = $quote_name ? $this->conn->quote_name($this->table) : $this->table;
+		$table = trim($quote_name ? $this->conn->quote_name($this->table) : $this->table);
 
 		if ($this->db_name) {
 			$table = $this->conn->quote_name($this->db_name) . ".$table";
@@ -474,13 +474,13 @@ class Table
 	private function set_table_name()
 	{
 		if (($table = $this->class->getStaticPropertyValue('table', null)) || ($table = $this->class->getStaticPropertyValue('table_name', null))) {
-			$this->table = $table;
+			$this->table = trim($table);
 		} else {
 			// infer table name from the class name
 			$this->table = Inflector::instance()->tableize($this->class->getName());
 
 			// strip namespaces from the table name if any
-			$parts = explode('\\', $this->table);
+			$parts = explode('\\', trim($this->table));
 			$this->table = $parts[count($parts)-1];
 		}
 
@@ -497,7 +497,7 @@ class Table
 
 		if (!($this->sequence = $this->class->getStaticPropertyValue('sequence'))) {
 			if (isset($this->pk[0])) {
-				$this->sequence = $this->conn->get_sequence_name($this->table, $this->pk[0]);
+				$this->sequence = $this->conn->get_sequence_name(trim($this->table), $this->pk[0]);
 			}
 		}
 	}
